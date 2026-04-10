@@ -29,12 +29,13 @@ type UsersDatas = {
 export default function UsersList() {
     const [search, setSearch] = useState("");
     const [page, setPage] = useState(1);             // page courante
-    const limit = 5;                                 // items par page
 
     const [usersList, setUsersList] = useState<UsersDatas[]>([]);
     const [savedUsersList, setSavedUsersList] = useState<UsersDatas[]>([]);
     const [getAdminRole, setAdminRole] = useState("");
-
+    const limit = 5;                                 // items par page
+    const [maxPage, setMaxPage] = useState(0);
+    const [start, setStart] = useState(1);
 
     const [loading, setIsLoading] = useState(false);
     const requireAdminRoles = ['Super-Admin', 'Supervisor-Admin'];
@@ -72,10 +73,17 @@ export default function UsersList() {
     }
 
     // 📑 Pagination
-    const start = (page - 1) * limit;
-    const maxPage = Math.ceil(savedUsersList.length / limit);
+    useEffect(() => {
+        (() => {
+            const maxPage = Math.ceil(savedUsersList?.length / limit);
 
-    const arrayUsersRefactory = savedUsersList
+            setMaxPage(maxPage);
+            setPage(maxPage);
+
+        })()
+    }, [savedUsersList])
+
+    const startPage = (start - 1) * limit;
 
     return (
         <div>
@@ -226,15 +234,21 @@ export default function UsersList() {
                             <div className="flex flex-row mt-4 space-x-4">
                                 <button
                                     className="px-4 py-3  font-semibold text-white ease duration-500 hover:bg-red-600 bg-red-500 rounded disabled:opacity-40"
-                                    onClick={() => setPage(page + 1)}
-                                    disabled={page === maxPage}
+                                    onClick={() => {
+                                        setPage(page - 1);
+                                        setStart(start + 1)
+                                    }}
+                                    disabled={page === 1}
                                 >
                                     <span className="relative top-[1px]"><FontAwesomeIcon icon={faChevronLeft} /></span> Précédent
                                 </button>
                                 <button
                                     className="px-4 py-3 bg-green-500 ease duration-500 hover:bg-green-600 text-white font-semibold rounded disabled:opacity-40"
-                                    onClick={() => setPage(page - 1)}
-                                    disabled={page === 1}
+                                    onClick={() => {
+                                        setPage(nextPage => nextPage + 1);
+                                        setStart(start - 1)
+                                    }}
+                                    disabled={page === maxPage}
                                 >
                                     Suivant<span className="relative top-[1px]"><FontAwesomeIcon icon={faChevronRight} /></span>
                                 </button>

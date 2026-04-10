@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 import AddUserHookModal from "./hook";
 
 export default function AddUser() {
-    const { dynamicArrayDatas, staticArrayData, inputs, setInputs, isLoading, handleSubmit } = AddUserHookModal();
+    const { dynamicArrayData, staticArrayData, inputs, setInputs, isLoading, handleSubmit } = AddUserHookModal();
     return (
         <main className="bg-gray-100 dark:bg-transparent">
             <div className="flex">
@@ -35,7 +35,7 @@ export default function AddUser() {
                         ))
                     }
 
-                    <div className='dark:border mt-8 w-full font-semibold h-auto border-gray-400 dark:border-gray-300 rounded-[30px] border  dark:shadow-none p-4'>
+                    <div className='dark:border mt-8 w-full font-semibold h-auto border-gray-400 dark:border-gray-800 dark:bg-gray-900 rounded-[30px] border  dark:shadow-none p-4'>
                         {
                             formElements.map((element) => (
 
@@ -90,7 +90,7 @@ export default function AddUser() {
                                                         {e.placeholder}
                                                     </option>
                                                     {
-                                                        e.dynamicOptions?.status ? dynamicArrayDatas
+                                                        e.dynamicOptions?.status ? dynamicArrayData
                                                             .find((item: any) => item.alias === e.alias)
                                                             ?.arrayData
                                                             ?.map((option: any) => (
@@ -115,7 +115,7 @@ export default function AddUser() {
                         <div className="flex w-full justify-end ">
                             <button type="button" onClick={(e) => {
                                 handleSubmit()
-                            }} className="bg-blue-600 my-2 hover:bg-blue-700 relative rounded-md font-semibold ease duration-500 text-white py-2.5 px-8">
+                            }} className="bg-blue-600 my-2 hover:bg-blue-700 relative rounded-md font-semibold ease duration-500 text-white py-3 px-8">
                                 <p className={isLoading ? "hidden" : "block"}> Exécuter</p>
                                 <p className={isLoading ? "block" : "hidden"}><ClipLoader color="#fff" size={16} /></p>
                             </button>

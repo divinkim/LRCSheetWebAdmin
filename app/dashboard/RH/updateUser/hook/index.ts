@@ -1,6 +1,6 @@
-'use client';
+"use client";
+import { useState, useEffect } from "react";
 import { providers } from "@/index";
-import { FormEvent, useEffect, useState } from "react";
 
 type InputsValue = {
     firstname: string | null,
@@ -17,20 +17,21 @@ type InputsValue = {
     ContractId: number | null,
     CountryId: number | null,
     CityId: number | null,
+    PlanningId:number|null,
     DistrictId: number | null,
-    PlanningId: number | null,
     QuarterId: number | null,
     photo: string | null,
     role: string | null,
     DepartmentPostId: number | null,
     maritalStatus: string | null,
     adminService: string | null,
-    [key: string]: string | number | null,
+    status: any,
+    [key: string]: string | number | null | undefined,
 }
 
-export default function AddUserHookModal() {
-    const [getEnterprises, setEnterprises] = useState<any[]>([]);
-    const [getDepartmentPosts, setDepartmentPosts] = useState<any[]>([]);
+export function UpdateUserHookModal() {
+    const [getEnterprises, setGetEnterprises] = useState<any[]>([]);
+    const [getDepartmentPosts, setGetDepartmentPosts] = useState<any[]>([]);
     const [getPosts, setPosts] = useState<any[]>([]);
     const [getSalary, setSalary] = useState<any[]>([]);
     const [getContractTypes, setContractTypes] = useState<any[]>([]);
@@ -39,10 +40,10 @@ export default function AddUserHookModal() {
     const [getCity, setCity] = useState<any[]>([]);
     const [getDistrict, setDistrict] = useState<any[]>([]);
     const [getQuarter, setQuarter] = useState<any[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [getEnterpriseIdOfadmin, setEnterpriseIdOfAdmin] = useState<string | null>(null)
+    const [adminRole, setAdminRole] = useState<string | null>(null);
     const [getPlannings, setPlannings] = useState<any[]>([])
-
-    const [enterpriseIdOfadmin, setEnterpriseIdOfAdmin] = useState<string | null>(null)
-    const [adminRole, setAdminRole] = useState<string | null>(null)
     const [inputs, setInputs] = useState<InputsValue>({
         firstname: null,
         lastname: null,
@@ -55,38 +56,57 @@ export default function AddUserHookModal() {
         PostId: null,
         SalaryId: null,
         ContractTypeId: null,
-        PlanningId: null,
         ContractId: null,
         CountryId: null,
         CityId: null,
         DistrictId: null,
+        PlanningId:null,
         QuarterId: null,
         photo: null,
         role: null,
         DepartmentPostId: null,
         maritalStatus: null,
         adminService: null,
+        status: ""
     });
 
-    const [isLoading, setIsLoading] = useState(false);
+    const requireRoles = ['Super-Admin', 'Supervisor-Admin', 'Moderator-Admin'];
 
     // Récupération des entreprises et filtrage en fonction de l'id de l'administrateur courant
     useEffect(() => {
         (async () => {
-            const getInputMemory = localStorage.getItem("inputMemoryOfAddUserPage");
-            getInputMemory ? setInputs(JSON.parse(getInputMemory ?? "")) : setInputs({ ...inputs });
-
+            const authToken = localStorage.getItem("authToken");
             const role = localStorage.getItem("adminRole");
-            const enterpriseIdOfAdmin = localStorage.getItem("EnterpriseId");
+            let getEnterpriseIdOfAdmin = localStorage.getItem("EnterpriseId");
+
+            setEnterpriseIdOfAdmin(getEnterpriseIdOfAdmin);
+            setAdminRole(role)
+
+            // if (authToken === null) {
+            //     return window.location.href = "/"
+            // } else if (!requireRoles.includes(role ?? "")) {
+            //     Swal.fire({
+            //         icon: "warning",
+            //         title: "Violation d'accès !",
+            //         text: "Vous n'êtes pas autorisé à accéder à cette page. Veuillez vous rapprocher de votre administreur pour plus d'infos !",
+            //     });
+            //     setTimeout(() => {
+            //         window.location.href = "/Dashboard"
+
+            //     }, 2000);
+            // }
 
             const getEnterprises = await providers.API.getAll(providers.APIUrl, "getEnterprises", null);
 
-            const getEnterpriseByAdminEnterpriseId = getEnterprises;
+            if (parseInt(getEnterpriseIdOfAdmin ?? "") !== 1) {
 
-            setEnterprises(getEnterpriseByAdminEnterpriseId);
-            setEnterpriseIdOfAdmin(enterpriseIdOfAdmin);
-            setAdminRole(role);
-        })();
+                const filterEnterpriseByEnterpriseId = getEnterprises.filter((enterprise: { id: number }) => enterprise.id === parseInt(getEnterpriseIdOfAdmin ?? ""));
+                setGetEnterprises(filterEnterpriseByEnterpriseId);
+                return
+            }
+            setGetEnterprises(getEnterprises);
+            console.log(getEnterprises);
+        })()
     }, []);
 
     //Récupération des plannings
@@ -102,12 +122,52 @@ export default function AddUserHookModal() {
         })()
     }, [inputs.EnterpriseId])
 
+    //Récupération des données de l'utilisateur en fonction de l'id sur le navigateur
+
+    useEffect(() => {
+        (async () => {
+            const getUserId = window.location.href.split('/').pop();
+            const getUser = await providers.API.getOne(providers.APIUrl, "getUser", parseInt(getUserId ?? ""));
+            console.log("l'utilisateur", getUser);
+            setInputs({
+                firstname: getUser.firstname ?? null,
+                lastname: getUser.lastname ?? null,
+                birthDate: new Date(getUser.birthDate)?.toISOString()?.split("T")[0] ?? null,
+                gender: getUser.gender ?? null,
+                email: getUser.email ?? null,
+                password: getUser.password ?? null,
+                phone: getUser.phone ?? null,
+                EnterpriseId: getUser.EnterpriseId ?? null,
+                PostId: getUser.PostId ?? null,
+                SalaryId: getUser.SalaryId ?? null,
+                ContractTypeId: getUser.ContractTypeId ?? null,
+                ContractId: getUser.ContractId ?? null,
+                CountryId: getUser.CountryId ?? null,
+                PlanningId:getUser.PlanningId ?? null,
+                CityId: getUser.CityId ?? null,
+                DistrictId: getUser.DistrictId ?? null,
+                QuarterId: getUser.QuarterId ?? null,
+                photo: getUser.photo ?? null,
+                role: getUser.role ?? null,
+                DepartmentPostId: getUser.DepartmentPostId ?? null,
+                maritalStatus: getUser.marialStatus ?? null,
+                adminService: getUser.adminService ?? null,
+                status: getUser.status ? "Actif" : "Inactif"
+            })
+        })()
+    }, [adminRole])
+
     // Récupération des départements d'entreprises
     useEffect(() => {
         (async () => {
             const getDepartmentPosts = await providers.API.getAll(providers.APIUrl, "getDepartmentPosts", null);
-            const filterDepartmentsByAdminEnterpriseId = getDepartmentPosts.filter((department: { EnterpriseId: number }) => department.EnterpriseId === inputs.EnterpriseId);
-            setDepartmentPosts(filterDepartmentsByAdminEnterpriseId)
+            if (adminRole !== "Super-Admin") {
+                const filteredDepartmentPosts = getDepartmentPosts.filter((department: { EnterpriseId: number }) => department.EnterpriseId === inputs.EnterpriseId);
+                setGetDepartmentPosts(filteredDepartmentPosts);
+            } else {
+                setGetDepartmentPosts(getDepartmentPosts);
+                console.log("les postes départements", getDepartmentPosts)
+            }
         })()
     }, [inputs.EnterpriseId]);
 
@@ -117,7 +177,7 @@ export default function AddUserHookModal() {
             const getPosts = await providers.API.getAll(providers.APIUrl, "getPosts", null);
             const filteredPosts = getPosts.filter((post: { EnterpriseId: number, DepartmentPostId: number }) => post.DepartmentPostId === inputs.DepartmentPostId && post.EnterpriseId === inputs.EnterpriseId);
             setPosts(filteredPosts)
-            console.log("Voici la liste des postes", filteredPosts);
+            console.log(filteredPosts);
         })()
     }, [inputs.DepartmentPostId, inputs.EnterpriseId]);
 
@@ -129,7 +189,7 @@ export default function AddUserHookModal() {
             setSalary(filteredSalries)
             console.log(filteredSalries);
         })()
-    }, [inputs.PostId, inputs.EnterpriseId]);
+    }, [inputs.PostId]);
 
     // Récupération des type de Contrat
     useEffect(() => {
@@ -196,10 +256,7 @@ export default function AddUserHookModal() {
         })()
     }, [inputs.DistrictId]);
 
-    // const adminRoles = ['Super-Admin', 'Supervisor-Admin'];
-    // const role = window?.localStorage.getItem("adminRole") ?? "";
-
-    let dynamicArrayData = [
+    const dynamicOptions = [
         {
             alias: "EnterpriseId",
             arrayData: getEnterprises.filter(item => item.id && item.name).map(item => ({ value: item.id, title: item.name }))
@@ -246,43 +303,18 @@ export default function AddUserHookModal() {
         }
     ];
 
-    let staticArrayData = [
+    const staticsOptions = [
         {
             alias: "gender",
-            arrayData: [
-                { title: "Homme", value: "Homme" },
-                {
-                    title: "Femme",
-                    value: "Femme"
-                },
-                {
-                    title: "Aucun",
-                    value: "Aucun"
-                }
-            ]
-
+            arrayData: [{ title: "Homme", value: "Homme" }, { title: "Femme", value: "Femme" }, { title: "Aucun", value: "Aucun" }]
         },
-
+        {
+            alias: "status",
+            arrayData: [{ title: "Actif", value: "Actif" }, { title: "Inactif", value: "Inactif" }]
+        },
         {
             alias: "role",
-            arrayData: [
-                {
-                    title: "Super administrateur",
-                    value: "Super-Admin"
-                },
-                {
-                    title: "Administrateur de gestion",
-                    value: "Supervisor-Admin"
-                },
-                {
-                    title: "Administrateur de contrôle",
-                    value: "Controllor-Admin"
-                },
-                {
-                    title: "Utilisateur client",
-                    value: "Client-User"
-                }
-            ]
+            arrayData: [{ title: "Super-Admin", value: "Super-Admin" }, { title: "Administrateur de contrôle", value: "Moderator-Admin" }, { title: "Supervisor-Admin", value: "Administrateur de supervision" }, { title: "Client-User", value: "Utilisateur client" }]
         },
         {
             alias: "adminService",
@@ -303,11 +335,9 @@ export default function AddUserHookModal() {
         }
     ]
 
-    console.log("le tableau des données statiques", dynamicArrayData)
-
     const handleSubmit = async () => {
-
         setIsLoading(true);
+        const userId = window.location.href?.split('/').pop();
 
         const requireFields = {
             firstname: inputs.firstname,
@@ -315,11 +345,12 @@ export default function AddUserHookModal() {
             gender: inputs.gender,
             password: inputs.password,
             EnterpriseId: inputs.EnterpriseId,
+            birthDate: inputs.birthDate,
             email: inputs.email,
             role: inputs.role,
             phone: inputs.phone,
-            CountryId: inputs.CountryId,
             CityId: inputs.CityId,
+            CountryId: inputs.CountryId
         }
 
         for (const [key, value] of Object.entries(requireFields)) {
@@ -328,21 +359,19 @@ export default function AddUserHookModal() {
             }
         }
 
-        const response = await providers.API.post(providers.APIUrl, "createUser", null, inputs);
-
-        if (response.status) localStorage.removeItem("inputMemoryOfAddUserPage");
+        console.log(requireFields);
+        const response = await providers.API.update(providers.APIUrl, "updateUser", null, inputs, Number(userId));
 
         providers.alertMessage(
             response.status,
             response.title,
             response.message,
-            response.status ? "/dashboard/RH/addUser" : null
+            response.status ? "/dashboard/RH/updateUser/" + userId : null
         );
 
         setIsLoading(false);
     };
 
-    console.log("les datas", inputs);
 
-    return { dynamicArrayData, staticArrayData, handleSubmit, inputs, setInputs, isLoading }
+    return { dynamicOptions, staticsOptions, setInputs, inputs, handleSubmit, isLoading, setIsLoading }
 }

@@ -32,11 +32,11 @@ export function RepportsListHook() {
     const [repportsArrayCloned, setRepportsArrayCloned] = useState<RepportsValue[]>([]);
     const [EnterpriseId, setEnterpriseId] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
-
+    const [adminReportCommentArray, setAdminReportCommentArray] =useState<any[]>([])
     const { setStoredNotificationsArray } = SidebarHook();
 
     useEffect(() => {
-        (() => {
+        (async() => {
             if (typeof (window) === "undefined") return;
             if (ComponentModal) {
                 let EnterpriseId = localStorage.getItem("EnterpriseId");
@@ -44,7 +44,8 @@ export function RepportsListHook() {
                 setRepportsArrayCloned(ComponentModal.at(0)?.Repport?.repportsArray ?? []);
                 setEnterpriseId(EnterpriseId);
             }
-
+            const getAdminRepportComment = await providers.API.getAll(providers.APIUrl, "getAdminReportComment", null);
+            setAdminReportCommentArray(getAdminRepportComment)
             setStoredNotificationsArray([]);
             localStorage.removeItem("storedNotificationsArray");
         })()
@@ -75,21 +76,28 @@ export function RepportsListHook() {
         setRepportsArrayCloned(repports)
     }
 
-    async function sendAdminResponse(adminResponse: string, tableName: string, id: number, email: string, UserId: number, lastname: string, firstname: string) {
+    async function adminReportComment(content: string, RepportId: number, email: string, UserId: number) {
         setIsLoading(true);
-
-        if (adminResponse === "") {
-            return setTimeout(() => {
-                providers.alertMessage(false, "Champs invalides", "Veuillez saisir un commentaire", null);
-                setIsLoading(false)
-            }, 1500);
+        if (!content) {
+            return providers.alertMessage(false, "Champ invalide", "Veuillez saisir un commentaire", "/dashboard/ADMIN/repportsList")
         }
+        const sendMail = await providers.API.post(providers.APIUrl, "sendMail", null, {
+            senderEmail: "grcinfos@gmail.com",
+            emails: [email],
+            subject: "Retour suite à votre rapport",
+            content,
+        });
+        console.log(sendMail);
 
-        const response = await providers.API.update(providers.APIUrl, "sendResponseAdmin", null, { adminResponse, tableName, UserId, email, lastname, firstname }, id);
+        const response = await providers.API.post(providers.APIUrl, "addAdminReportComment", null, {
+            UserId,
+            content,
+            RepportId
+        });
+        console.log(response);
 
-        providers.alertMessage(response.status, response.title, response.message, response.status ? "/dashboard/ADMIN/repportsList" : null);
-        setIsLoading(false);
+        providers.alertMessage(response.status, response.title, response.message, "/dashboard/ADMIN/repportsList")
     }
 
-    return { itemIndex, setItemIndex, isVisible, setIsVisible, itemIndexOnWriting, setItemIndexOnWriting, setAdminResponse, setMonthIndice, monthIndice, repportsArrayCloned, EnterpriseId, ComponentModal, filterRepportsByUsersNames, navigateBetweenMonths, adminResponse, monthsOfYear, RepportsArray, sendAdminResponse, isLoading, setIsLoading, }
+    return { itemIndex, setItemIndex, isVisible, setIsVisible, itemIndexOnWriting, setItemIndexOnWriting, setAdminResponse, setMonthIndice, monthIndice, repportsArrayCloned, EnterpriseId, ComponentModal, filterRepportsByUsersNames, navigateBetweenMonths, adminResponse, monthsOfYear, RepportsArray, adminReportComment, isLoading, setIsLoading, adminReportCommentArray}
 }

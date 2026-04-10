@@ -6,7 +6,7 @@ import { RepportsListHook } from "./hook";
 import { ClipLoader } from "react-spinners";
 
 export default function Repports() {
-    const { itemIndex, setItemIndex, isVisible, setIsVisible, itemIndexOnWriting, setItemIndexOnWriting, setAdminResponse, setMonthIndice, monthIndice, repportsArrayCloned, EnterpriseId, ComponentModal, filterRepportsByUsersNames, navigateBetweenMonths, adminResponse, monthsOfYear, RepportsArray, sendAdminResponse, isLoading, setIsLoading } = RepportsListHook();
+    const { itemIndex, setItemIndex, isVisible, setIsVisible, itemIndexOnWriting, setItemIndexOnWriting, setAdminResponse, setMonthIndice, monthIndice, repportsArrayCloned, EnterpriseId, ComponentModal, filterRepportsByUsersNames, navigateBetweenMonths, adminResponse, monthsOfYear, RepportsArray, adminReportComment, isLoading, setIsLoading, adminReportCommentArray } = RepportsListHook();
 
     return (
         <main className="bg-gray-100 dark:bg-transparent">
@@ -77,16 +77,22 @@ export default function Repports() {
                                             </p>
 
                                             <div className={itemIndex === index && isVisible ? "relative -top-2" : "hidden"}>
-                                                <p className={repport.adminResponse ? "rounded-md border border-gray-400 p-4" : "hidden"}>
-                                                    Commentaire de l'administrateur: <span className="font-normal">{repport?.adminResponse}</span>
-                                                </p>
+                                                {
+                                                    adminReportCommentArray.length > 0 ? adminReportCommentArray.map((item: { UserId: number, RepportId: number, content: string }) => (
+                                                        <div className="mb-4">
+                                                            <p className={item.UserId === repport.UserId && item.RepportId === repport.id ? "rounded-md border border-gray-400 p-4" : "hidden"}>
+                                                                Commentaire de l'administrateur: <span className="font-normal">{item.content}</span>
+                                                            </p>
+                                                        </div>
+                                                    )) : ""
+                                                }
                                                 <textarea value={itemIndexOnWriting === index ? adminResponse : ""} onChange={(e) => {
                                                     setAdminResponse(e.target.value);
                                                     setItemIndexOnWriting(index)
                                                 }} name="" id="" placeholder="Laissez un commentaire!" className="w-full bg-transparent  border border-gray-400 my-4 rounded-md dark:text-gray-300 placeholder-gray-600 dark:placeholder-gray-300  h-[100px] p-4 outline-none">
                                                 </textarea>
                                                 <button onClick={() => {
-                                                    sendAdminResponse(adminResponse, "Repport", repport.id, repport.User.email, repport.UserId, repport.User.lastname, repport.User.firstname)
+                                                    adminReportComment(adminResponse, repport.id, repport.User.email, repport.UserId)
                                                 }} type="button" className="text-white bg-blue-600 rounded-md hover:bg-blue-600 w-[100px] py-2">
                                                     {isLoading ? <ClipLoader size={16} color="#fff" /> : "Envoyer"}
                                                 </button>

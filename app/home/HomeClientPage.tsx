@@ -71,7 +71,7 @@ export default function HomePage() {
     console.log("entreprise", enterprise)
     return (
         <div>
-            {/* <Loader isLoading={isLoading} /> */}
+            <Loader isLoading={isLoading} />
             {
                 enterprise.subscriptionStatus === "expired" && <SubscriptionEpiredComponent />
             }

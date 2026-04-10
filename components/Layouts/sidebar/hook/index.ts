@@ -178,7 +178,7 @@ export default function SidebarHook() {
                 {
                     index: 4,
                     title: "Liste des collaborateurs au planning",
-                    href: "/dashboard/RH/weekDaysPlanningsList",
+                    href: "/dashboard/RH/getUsersInPlanningOfWeek",
                     icon: faCalendarCheck
                 },
             ]

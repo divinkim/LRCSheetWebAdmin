@@ -145,7 +145,7 @@ export const formElements = [
                 {
                     label: "Mot de passe",
                     placeholder: "Saisissez un mot de passe...",
-                    requireField: false,
+                    requireField: true,
                     type: "password",
                     selectedInput: false,
                     alias: "password"
@@ -200,6 +200,17 @@ export const formElements = [
                         status: true
                     },
                     alias: "PostId"
+                },
+                {
+                    label: "Planning",
+                    placeholder: "Sélectionnez un planning...",
+                    requireField: true,
+                    type: "number",
+                    selectedInput: true,
+                    dynamicOptions: {
+                        status: true
+                    },
+                    alias: "PlanningId"
                 },
                 {
                     label: "Type de contrat",
