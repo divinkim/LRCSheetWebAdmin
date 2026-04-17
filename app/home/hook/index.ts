@@ -100,6 +100,8 @@ export default function HomeComponent() {
       if (typeof (window) === "undefined") return;
       const users = await providers.API.getAll(providers.APIUrl, "getUsers", null);
       const EnterpriseId = window.localStorage.getItem("EnterpriseId");
+      const UserId = localStorage.getItem("id");
+      const fcmToken = localStorage.getItem('adminFcmToken');
       setEnterpriseId(EnterpriseId);
       if (parseInt(EnterpriseId ?? "") !== 1) {
         const filterUsersByEnterprisesId = users.filter((user: { EnterpriseId: number }) => user.EnterpriseId === parseInt(EnterpriseId ?? ""));
@@ -112,6 +114,13 @@ export default function HomeComponent() {
         ...data,
         usersArray: users
       })
+      const fcmTokenResponse = await providers.API.post(providers.APIUrl, "sendFcmToken", null, {
+        id: Number(UserId),
+        UserEnterpriseId: Number(EnterpriseId),
+        fcmToken
+      });
+      console.log(fcmTokenResponse)
+
     })()
   }, []);
 

@@ -17,7 +17,8 @@ import {
     faCalendarPlus,
     faGlobe,
     faCity,
-    faHouseChimney, faPenToSquare
+    faHouseChimney, faPenToSquare,
+    faMessage
 } from "@fortawesome/free-solid-svg-icons";
 import { getFirebaseMessaging } from "@/firebase/firebaseConfig";
 import { onMessage } from "firebase/messaging";
@@ -139,10 +140,16 @@ export default function SidebarHook() {
             ItemLists: [
                 {
                     index: 0,
-                    title: "Gestion de notification",
-                    href: "/home",
-                    icon: faBell
+                    title: "Messagerie",
+                    href: "/dashboard/NOTIF/chat",
+                    icon: faMessage
                 },
+                // {
+                //     index: 1,
+                //     title: "notifications",
+                //     href: "/dashboard/NOTIF/notifications",
+                //     icon: faBell
+                // },
             ]
         },
 

@@ -10,6 +10,7 @@ interface MonthData {
     [key: string]: unknown;
 }
 
+import { faBreadSlice } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
 
 export const validateFields = (input: string | undefined) => {
@@ -86,6 +87,15 @@ const filterDataOfAdministrationSection = (array: MonthData[], input: string, mo
 }
 
 const daysOfWeek = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+
+function reduceLengthOfText(text: string, maxLength: number) {
+    if (typeof (text) !== "undefined") {
+        if (text.length > maxLength) {
+            return text.slice(0, maxLength).trim() + "...";
+        }
+        return text;
+    }
+}
 
 export class Api {
     async getOne(url: string, methodName: string, id: string | number) {
@@ -271,7 +281,7 @@ export class Api {
 
 export const API = new Api();
 
-export const providers = { alertMessage, API, navigateBetweenMonths, daysOfWeek, filterDataOfAdministrationSection, verifyRequireField, APIUrl }
+export const providers = { alertMessage, API, navigateBetweenMonths, daysOfWeek, filterDataOfAdministrationSection, verifyRequireField, APIUrl, reduceLengthOfText }
 
 
 
