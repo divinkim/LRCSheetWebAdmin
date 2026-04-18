@@ -136,11 +136,11 @@ export default function SidebarHook() {
         // Onglet notifications
         {
             index: 0,
-            title: "🔔 Notification",
+            title: "💬 Messagerie",
             ItemLists: [
                 {
                     index: 0,
-                    title: "Messagerie",
+                    title: "Chat",
                     href: "/dashboard/NOTIF/chat",
                     icon: faMessage
                 },
