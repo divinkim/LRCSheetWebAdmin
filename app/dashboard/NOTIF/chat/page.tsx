@@ -109,7 +109,7 @@ export default function Chat() {
 
                                 <div className="w-12 h-12 bg-gray-300 rounded-full mr-3">
                                     <img
-                                        src={item?.User?.photo ? `${providers.APIUrl}/images/${item?.User?.photo}` : "/images/userProfile.png"}
+                                        src={item?.User?.photo ? `${providers.APIUrl}/images/${item?.User?.photo}` : "/images/clientProfile.png"}
                                         alt="User Avatar"
                                         className="w-12 h-12 rounded-full object-cover"
                                     />
